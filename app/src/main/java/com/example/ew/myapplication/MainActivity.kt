@@ -3,6 +3,7 @@ package com.example.ew.myapplication
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.os.Environment
 import android.provider.MediaStore
 import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
@@ -10,6 +11,9 @@ import android.support.v7.widget.Toolbar
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.ImageView
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -67,4 +71,29 @@ class MainActivity : AppCompatActivity() {
             mImageView.setImageBitmap(imageBitmap)
         }
     }
+
+    private fun createImageFile(): Pair<File, String> {
+        val storageDir = Environment.getExternalStoragePublicDirectory(
+                        Environment.DIRECTORY_PICTURES);
+        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+        val imageFileName = "mosquitoPix_" + timeStamp + "_"
+
+
+        val image =  File.createTempFile(imageFileName, ".jpg", storageDir)
+        val path = "file:" + image.getAbsolutePath()
+
+        return Pair(image, path)
+    }
+
+
+    /*
+    private File createImageFile() throws IOException {
+        // Create an image file name
+
+        // Save a file: path for use with ACTION_VIEW intents
+        mCurrentPhotoPath = "file:" + image.getAbsolutePath();
+        return image;
+    }
+    */
+
 }
