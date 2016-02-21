@@ -2,16 +2,19 @@ package com.example.ew.myapplication
 
 import android.content.Intent
 import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.ImageView
 import java.io.File
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -57,43 +60,44 @@ class MainActivity : AppCompatActivity() {
 
     val REQUEST_IMAGE_CAPTURE = 1
     private fun dispatchTakePictureIntent() {
+
         val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
+            var file: File? = null
+
+            try {
+                file = createImageFile()
+            } catch (e: IOException) {
+
+            }
+
+            if (file != null) {
+                val uri = Uri.fromFile(file)
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri)
+                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
+            }
         }
     }
 
-    override fun onActivityResult(requestCode:Int, resultCode:Int, data:Intent) {
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK)
-        {
-            val extras = data.getExtras()
-            val imageBitmap = extras.get("data") as Bitmap
-            mImageView.setImageBitmap(imageBitmap)
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+        val a = 2 + 2
+
+
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            //val extras = data.getExtras()
+
+            // val mediaScanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+            // mediaScanIntent.setData(uri);
+            // this.sendBroadcast(mediaScanIntent);
+
+            //val imageBitmap = extras.get("data") as Bitmap
+            //mImageView.setImageBitmap(imageBitmap)
         }
     }
 
-    private fun createImageFile(): Pair<File, String> {
-        val storageDir = Environment.getExternalStoragePublicDirectory(
-                        Environment.DIRECTORY_PICTURES);
-        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-        val imageFileName = "mosquitoPix_" + timeStamp + "_"
-
-
-        val image =  File.createTempFile(imageFileName, ".jpg", storageDir)
-        val path = "file:" + image.getAbsolutePath()
-
-        return Pair(image, path)
+    private fun createImageFile(): File? {
+        val storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+        return File.createTempFile("mosquitoPix_", ".jpg", storageDir)
     }
-
-
-    /*
-    private File createImageFile() throws IOException {
-        // Create an image file name
-
-        // Save a file: path for use with ACTION_VIEW intents
-        mCurrentPhotoPath = "file:" + image.getAbsolutePath();
-        return image;
-    }
-    */
-
 }
